@@ -1,12 +1,21 @@
 import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { createCustomElement } from '@angular/elements';
+import { createApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
 
-import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
 if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+const ELEMENT_TAG = 'standalone-element';
+createApplication().then((appRef) => {
+  const elementCtor = createCustomElement(AppComponent, {
+    injector: appRef.injector,
+  });
+  if (!customElements.get(ELEMENT_TAG)) {
+    customElements.define(ELEMENT_TAG, elementCtor);
+    console.log(`${ELEMENT_TAG} created`);
+  }
+});
